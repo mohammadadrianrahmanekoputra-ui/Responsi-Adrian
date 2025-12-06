@@ -1,102 +1,386 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Check, X } from "lucide-react";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kuis Kalkulus – Adrian</title>
 
-export default function QuizUI() {
-  const questions = [
-    {
-      q: "Turunan dari y = x^{f(x)} adalah ...",
-      options: ["(a)", "(b)", "(c)", "(d)"],
-      answer: 2,
-    },
-    {
-      q: "Pernyataan tentang grafik f dan f^{-1} yang benar adalah ...",
-      options: ["(a)", "(b)", "(c)", "(d)"],
-      answer: 1,
-    },
-  ];
+<!-- MathJax for LaTeX -->
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  const [selected, setSelected] = useState(Array(questions.length).fill(null));
-  const [submitted, setSubmitted] = useState(false);
+<style>
+  :root{
+    --bg:#0d1117;
+    --card:#161b22;
+    --muted:#8b949e;
+    --accent:#58a6ff;
+    --ok:#16a34a;
+    --bad:#ef4444;
+    --glass: rgba(255,255,255,0.02);
+  }
 
-  const score = selected.reduce((acc, s, i) => acc + (s === questions[i].answer ? 1 : 0), 0);
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:#e6edf3;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.4;
+  }
 
-  const handleSelect = (qi, oi) => {
-    if (!submitted) {
-      setSelected((prev) => {
-        const newSel = [...prev];
-        newSel[qi] = oi;
-        return newSel;
-      });
-    }
-  };
+  header{padding:28px 16px 8px; text-align:center}
+  h1{margin:0; color:var(--accent); font-size:1.6rem}
+  p.lead{margin:8px 0 0; color:var(--muted); font-size:0.95rem}
 
-  return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Quiz — Adrian</h1>
+  .wrap{max-width:880px; margin:28px auto; padding:0 16px;}
 
-      <div className="w-full max-w-2xl space-y-6">
-        {questions.map((item, qi) => (
-          <motion.div
-            key={qi}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-5 rounded-2xl bg-neutral-900 shadow-lg border border-neutral-700"
-          >
-            <p className="mb-4 font-semibold">{item.q}</p>
+  .card{
+    background:linear-gradient(180deg,var(--card), rgba(22,27,34,0.88));
+    border:1px solid rgba(255,255,255,0.03);
+    padding:18px;
+    border-radius:14px;
+    box-shadow: 0 6px 24px rgba(2,6,23,0.6);
+    margin-bottom:18px;
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .card:hover{transform:translateY(-6px); box-shadow:0 12px 36px rgba(2,6,23,0.75);}
 
-            <div className="space-y-3">
-              {item.options.map((opt, oi) => {
-                const isCorrect = oi === item.answer;
-                const isSelected = selected[qi] === oi;
+  .q-title{color:#79c0ff; font-weight:600; margin-bottom:10px; font-size:1rem}
+  .options{display:block; margin:6px 0 0}
+  .option{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:var(--glass);
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.02);
+    cursor:pointer;
+    transition:all .18s ease;
+    user-select:none;
+  }
+  .option:hover{transform:translateY(-4px)}
+  .option input{display:none;}
 
-                return (
-                  <motion.button
-                    key={oi}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => handleSelect(qi, oi)}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all
-                      ${
-                        submitted
-                          ? isCorrect
-                            ? "border-green-500 bg-green-900/30"
-                            : isSelected
-                            ? "border-red-500 bg-red-900/30"
-                            : "border-neutral-700"
-                          : isSelected
-                          ? "border-blue-500 bg-blue-900/30"
-                          : "border-neutral-700 bg-neutral-800"
-                      }
-                    `}
-                  >
-                    <span>{opt}</span>
+  /* selection highlight before submit */
+  .option.selected{outline:2px solid rgba(88,166,255,0.14); background:rgba(88,166,255,0.04)}
 
-                    {submitted && isCorrect && <Check className="text-green-400" />}
-                    {submitted && !isCorrect && isSelected && <X className="text-red-400" />}
-                  </motion.button>
-                );
-              })}
-            </div>
-          </motion.div>
-        ))}
-      </div>
+  /* after submit: correct / wrong */
+  .option.correct{
+    background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03));
+    border:1px solid rgba(16,185,129,0.25);
+    box-shadow: 0 6px 20px rgba(16,185,129,0.05) inset;
+  }
+  .option.wrong{
+    background: linear-gradient(90deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));
+    border:1px solid rgba(239,68,68,0.22);
+    box-shadow: 0 6px 20px rgba(239,68,68,0.04) inset;
+  }
 
-      <button
-        onClick={() => setSubmitted(true)}
-        className="mt-6 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-lg font-semibold"
-      >
-        Submit All
-      </button>
+  .explain{
+    margin-top:10px;
+    padding:12px;
+    border-left:4px solid var(--accent);
+    background: rgba(13,17,23,0.9);
+    border-radius:8px;
+    display:none;
+    color:#dbeafe;
+    font-size:0.95rem;
+  }
 
-      {submitted && (
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="mt-6 text-2xl font-bold"
-        >
-          Score: {score} / {questions.length}
-        </motion.div>
-      )}
+  .controls{display:flex; gap:12px; align-items:center; margin-top:10px; flex-wrap:wrap}
+  .btn{
+    appearance:none; border:0; padding:10px 14px; border-radius:10px; cursor:pointer;
+    font-weight:600; letter-spacing:.2px;
+  }
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#2ea6ff); color:#041129}
+  .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted)}
+  .result{
+    margin-top:18px; padding:14px; border-radius:12px; text-align:center;
+    background: linear-gradient(90deg, rgba(88,166,255,0.03), rgba(88,166,255,0.01));
+    border:1px solid rgba(88,166,255,0.06);
+    font-size:1.05rem;
+    transform-origin:center;
+    animation: pop .35s ease both;
+  }
+
+  @keyframes pop{
+    from{transform:scale(.92); opacity:0} to{transform:scale(1); opacity:1}
+  }
+
+  footer{color:var(--muted); text-align:center; margin:34px 0 60px; font-size:0.93rem}
+  small.help{display:block; color:var(--muted); margin-top:6px; font-size:0.86rem}
+
+  /* responsive */
+  @media (max-width:520px){
+    .q-title{font-size:0.97rem}
+    .option{padding:10px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kuis Kalkulus — Dark Mode</h1>
+  <p class="lead">Pilih jawaban untuk setiap soal, lalu tekan <strong>Submit All</strong></p>
+</header>
+
+<main class="wrap">
+  <!-- QUESTION 1 -->
+  <div class="card" data-q="1">
+    <div class="q-title">1. Diberikan fungsi \( y = x^{f(x)} \) untuk \( x > 0 \). Turunan dari fungsi tersebut adalah:</div>
+
+    <div class="options" data-name="q1">
+      <label class="option" data-choice="a">
+        <span>a) \( x^{f(x)-1}(xf'(x)+f(x)) \)</span>
+        <input type="radio" name="q1" value="a">
+      </label>
+
+      <label class="option" data-choice="b">
+        <span>b) \( f(x)x^{f(x)-1} + x^{f(x)}\ln x \)</span>
+        <input type="radio" name="q1" value="b">
+      </label>
+
+      <label class="option" data-choice="c">
+        <span>c) \( x^{f(x)}\left(f'(x)\ln x + \frac{f(x)}{x}\right) \)</span>
+        <input type="radio" name="q1" value="c">
+      </label>
+
+      <label class="option" data-choice="d">
+        <span>d) \( x^{f(x)-1}f'(x) \)</span>
+        <input type="radio" name="q1" value="d">
+      </label>
     </div>
-  );
+
+    <div id="ex1" class="explain">
+      Ambil logaritma: \( \ln y = f(x)\ln x \). Turunkan: \( \frac{y'}{y} = f'(x)\ln x + \frac{f(x)}{x} \). Jadi \( y' = x^{f(x)}\left(f'(x)\ln x + \frac{f(x)}{x}\right) \).
+    </div>
+  </div>
+
+  <!-- QUESTION 2 -->
+  <div class="card" data-q="2">
+    <div class="q-title">2. Manakah pernyataan yang benar tentang grafik fungsi \( f \) dan inversnya \( f^{-1} \)?</div>
+
+    <div class="options" data-name="q2">
+      <label class="option" data-choice="a">
+        <span>a) Grafiknya selalu tegak lurus</span>
+        <input type="radio" name="q2" value="a">
+      </label>
+
+      <label class="option" data-choice="b">
+        <span>b) Grafiknya simetris terhadap garis \( y=x \)</span>
+        <input type="radio" name="q2" value="b">
+      </label>
+
+      <label class="option" data-choice="c">
+        <span>c) Selalu berpotongan di dua titik</span>
+        <input type="radio" name="q2" value="c">
+      </label>
+
+      <label class="option" data-choice="d">
+        <span>d) Tidak ada hubungan khusus</span>
+        <input type="radio" name="q2" value="d">
+      </label>
+    </div>
+
+    <div id="ex2" class="explain">
+      Grafik \( f \) dan \( f^{-1} \) selalu simetris terhadap garis \( y=x \). Jika \( (a,b) \in f \), maka \( (b,a) \in f^{-1} \).
+    </div>
+  </div>
+
+  <!-- QUESTION 3 -->
+  <div class="card" data-q="3">
+    <div class="q-title">3. Pernyataan benar tentang fungsi \( \operatorname{arccot} x \) adalah …</div>
+
+    <div class="options" data-name="q3">
+      <label class="option" data-choice="a">
+        <span>a) I saja</span>
+        <input type="radio" name="q3" value="a">
+      </label>
+
+      <label class="option" data-choice="b">
+        <span>b) I, II</span>
+        <input type="radio" name="q3" value="b">
+      </label>
+
+      <label class="option" data-choice="c">
+        <span>c) II, IV</span>
+        <input type="radio" name="q3" value="c">
+      </label>
+
+      <label class="option" data-choice="d">
+        <span>d) I, III, IV</span>
+        <input type="radio" name="q3" value="d">
+      </label>
+    </div>
+
+    <div id="ex3" class="explain">
+      I salah (arccot berarti \( \cot y = x \)). II benar (domain seluruh bilangan real). III salah (range biasanya \( (0,\pi) \)). IV benar (arccot 0 = \( \pi/2 \)). Jadi benar: II dan IV.
+    </div>
+  </div>
+
+  <!-- QUESTION 4 -->
+  <div class="card" data-q="4">
+    <div class="q-title">4. Pernyataan benar tentang fungsi hiperbolik berikut adalah …</div>
+
+    <div class="options" data-name="q4">
+      <label class="option" data-choice="a">
+        <span>a) I saja</span>
+        <input type="radio" name="q4" value="a">
+      </label>
+
+      <label class="option" data-choice="b">
+        <span>b) I, II</span>
+        <input type="radio" name="q4" value="b">
+      </label>
+
+      <label class="option" data-choice="c">
+        <span>c) III, IV</span>
+        <input type="radio" name="q4" value="c">
+      </label>
+
+      <label class="option" data-choice="d">
+        <span>d) II, III, IV</span>
+        <input type="radio" name="q4" value="d">
+      </label>
+    </div>
+
+    <div id="ex4" class="explain">
+      I salah (tanh adalah fungsi ganjil). II salah (sech adalah genap). III benar (\( \cosh^2 x = 1 + \sinh^2 x \)). IV benar (cosh genap → simetri sumbu-y). Jadi benar: III dan IV.
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+    <button id="submitBtn" class="btn primary">Submit All</button>
+    <button id="resetBtn" class="btn ghost">Reset</button>
+    <small class="help">Penjelasan akan muncul setelah submit. Pilih satu jawaban per soal.</small>
+  </div>
+
+  <!-- Result -->
+  <div id="resultWrap" style="margin-top:16px"></div>
+
+</main>
+
+<footer>Created by Adrian · 2025</footer>
+
+<script>
+/*
+  Behavior:
+  - Users select options (click the .option labels)
+  - Clicking "Submit All" will:
+    * mark correct options with .correct
+    * mark selected wrong options with .wrong
+    * reveal explanations (.explain)
+    * show score
+  - Reset clears selections and UI
+*/
+
+// correct answers mapping (question name -> choice)
+const answers = {
+  q1: 'c',
+  q2: 'b',
+  q3: 'c',
+  q4: 'c'
+};
+
+document.addEventListener('click', (e) => {
+  // allow clicking the label block to select input
+  const opt = e.target.closest('.option');
+  if (opt && !document.body.classList.contains('submitted')) {
+    // mark selection visually
+    const parent = opt.parentElement;
+    // deselect siblings
+    parent.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    // set the hidden input
+    const input = opt.querySelector('input[type="radio"]');
+    if (input) input.checked = true;
+  }
+});
+
+const submitBtn = document.getElementById('submitBtn');
+const resetBtn = document.getElementById('resetBtn');
+const resultWrap = document.getElementById('resultWrap');
+
+function evaluate() {
+  if (document.body.classList.contains('submitted')) return;
+  document.body.classList.add('submitted');
+
+  const questionCards = document.querySelectorAll('.card');
+  let score = 0, total = 0;
+
+  questionCards.forEach(card => {
+    const optionsDiv = card.querySelector('.options');
+    const qName = optionsDiv.getAttribute('data-name'); // q1/q2/...
+    const correct = answers[qName];
+    total++;
+
+    // show explanations
+    const ex = card.querySelector('.explain');
+    if (ex) ex.style.display = 'block';
+
+    // mark each option
+    const opts = optionsDiv.querySelectorAll('.option');
+    let userSelected = null;
+    opts.forEach(o => {
+      const val = o.getAttribute('data-choice');
+      const input = o.querySelector('input[type="radio"]');
+      if (input && input.checked) userSelected = val;
+    });
+
+    opts.forEach(o => o.classList.remove('correct','wrong'));
+
+    // mark correct option
+    const correctEl = optionsDiv.querySelector('.option[data-choice="'+correct+'"]');
+    if (correctEl) correctEl.classList.add('correct');
+
+    // if user selected wrong, mark it
+    if (userSelected && userSelected !== correct) {
+      const wrongEl = optionsDiv.querySelector('.option[data-choice="'+userSelected+'"]');
+      if (wrongEl) wrongEl.classList.add('wrong');
+    }
+
+    // scoring
+    if (userSelected === correct) score++;
+  });
+
+  // show result
+  resultWrap.innerHTML = '';
+  const r = document.createElement('div');
+  r.className = 'result';
+  r.innerHTML = `<strong>Skor: ${score} / ${total}</strong><div style="margin-top:6px;color:var(--muted)">Terima kasih telah mengerjakan!</div>`;
+  resultWrap.appendChild(r);
+
+  // render math (in case explanations contain LaTeX)
+  if (window.MathJax && MathJax.typeset) {
+    MathJax.typeset();
+  }
 }
+
+function resetAll() {
+  document.body.classList.remove('submitted');
+  resultWrap.innerHTML = '';
+  // hide explanations
+  document.querySelectorAll('.explain').forEach(e => e.style.display = 'none');
+  // deselect inputs and selected/wrong/correct classes
+  document.querySelectorAll('.option').forEach(o => {
+    o.classList.remove('selected','wrong','correct');
+    const input = o.querySelector('input[type="radio"]');
+    if (input) input.checked = false;
+  });
+  // smooth scroll to top of quiz
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+submitBtn.addEventListener('click', evaluate);
+resetBtn.addEventListener('click', resetAll);
+
+// ensure MathJax renders after page load
+window.addEventListener('load', () => {
+  if (window.MathJax && MathJax.typeset) MathJax.typeset();
+});
+</script>
+</body>
+</html>
