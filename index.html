@@ -1,172 +1,102 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kuis Kalkulus – Adrian</title>
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Check, X } from "lucide-react";
 
-<!-- MathJax for LaTeX -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+export default function QuizUI() {
+  const questions = [
+    {
+      q: "Turunan dari y = x^{f(x)} adalah ...",
+      options: ["(a)", "(b)", "(c)", "(d)"],
+      answer: 2,
+    },
+    {
+      q: "Pernyataan tentang grafik f dan f^{-1} yang benar adalah ...",
+      options: ["(a)", "(b)", "(c)", "(d)"],
+      answer: 1,
+    },
+  ];
 
-<style>
-    body {
-        background: #0d1117;
-        color: #e6edf3;
-        font-family: "Inter", sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-    h1 {
-        text-align: center;
-        padding: 20px 0;
-        color: #58a6ff;
-    }
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 20px;
-    }
-    .question-box {
-        background: #161b22;
-        border: 1px solid #30363d;
-        padding: 20px;
-        margin-bottom: 25px;
-        border-radius: 12px;
-    }
-    .question-title {
-        font-size: 18px;
-        margin-bottom: 15px;
-        color: #79c0ff;
-    }
-    .options label {
-        display: block;
-        margin: 6px 0;
-        cursor: pointer;
-    }
-    button {
-        background: #238636;
-        color: white;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    button:hover {
-        background: #2ea043;
-    }
-    .explanation {
-        margin-top: 12px;
-        padding: 12px;
-        border-left: 4px solid #58a6ff;
-        background: #0d1117;
-        display: none;
-    }
-    footer {
-        text-align: center;
-        padding: 20px;
-        margin-top: 40px;
-        color: #8b949e;
-        font-size: 14px;
-    }
-</style>
-</head>
-<body>
+  const [selected, setSelected] = useState(Array(questions.length).fill(null));
+  const [submitted, setSubmitted] = useState(false);
 
-<h1>Kuis Kalkulus – Dark Mode</h1>
+  const score = selected.reduce((acc, s, i) => acc + (s === questions[i].answer ? 1 : 0), 0);
 
-<div class="container">
+  const handleSelect = (qi, oi) => {
+    if (!submitted) {
+      setSelected((prev) => {
+        const newSel = [...prev];
+        newSel[qi] = oi;
+        return newSel;
+      });
+    }
+  };
 
-    <!-- Question 1 -->
-    <div class="question-box">
-        <div class="question-title">
-            1. Diberikan fungsi \( y = x^{f(x)} \) untuk \( x > 0 \). Turunan dari fungsi tersebut adalah:
-        </div>
-        <div class="options">
-            <label><input type="radio" name="q1"> a) \( x^{f(x)-1}(xf'(x)+f(x)) \)</label>
-            <label><input type="radio" name="q1"> b) \( f(x)x^{f(x)-1} + x^{f(x)}\ln x \)</label>
-            <label><input type="radio" name="q1" value="correct"> c) \( x^{f(x)}\left(f'(x)\ln x + \frac{f(x)}{x}\right) \)</label>
-            <label><input type="radio" name="q1"> d) \( x^{f(x)-1}f'(x) \)</label>
-        </div>
-        <button onclick="showExplanation('exp1')">Lihat Penjelasan</button>
-        <div id="exp1" class="explanation">
-            Ambil logaritma:  
-            \( \ln y = f(x)\ln x \).  
-            Turunkan:  
-            \( \frac{y'}{y} = f'(x)\ln x + \frac{f(x)}{x} \).  
-            Maka \( y' = x^{f(x)}\left(f'(x)\ln x + \frac{f(x)}{x}\right) \).
-        </div>
+  return (
+    <div className="min-h-screen bg-black text-white flex flex-col items-center p-6">
+      <h1 className="text-3xl font-bold mb-6">Quiz — Adrian</h1>
+
+      <div className="w-full max-w-2xl space-y-6">
+        {questions.map((item, qi) => (
+          <motion.div
+            key={qi}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-5 rounded-2xl bg-neutral-900 shadow-lg border border-neutral-700"
+          >
+            <p className="mb-4 font-semibold">{item.q}</p>
+
+            <div className="space-y-3">
+              {item.options.map((opt, oi) => {
+                const isCorrect = oi === item.answer;
+                const isSelected = selected[qi] === oi;
+
+                return (
+                  <motion.button
+                    key={oi}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => handleSelect(qi, oi)}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all
+                      ${
+                        submitted
+                          ? isCorrect
+                            ? "border-green-500 bg-green-900/30"
+                            : isSelected
+                            ? "border-red-500 bg-red-900/30"
+                            : "border-neutral-700"
+                          : isSelected
+                          ? "border-blue-500 bg-blue-900/30"
+                          : "border-neutral-700 bg-neutral-800"
+                      }
+                    `}
+                  >
+                    <span>{opt}</span>
+
+                    {submitted && isCorrect && <Check className="text-green-400" />}
+                    {submitted && !isCorrect && isSelected && <X className="text-red-400" />}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <button
+        onClick={() => setSubmitted(true)}
+        className="mt-6 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-lg font-semibold"
+      >
+        Submit All
+      </button>
+
+      {submitted && (
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="mt-6 text-2xl font-bold"
+        >
+          Score: {score} / {questions.length}
+        </motion.div>
+      )}
     </div>
-
-    <!-- Question 2 -->
-    <div class="question-box">
-        <div class="question-title">
-            2. Manakah pernyataan yang benar tentang grafik fungsi \( f \) dan inversnya \( f^{-1} \)?
-        </div>
-        <div class="options">
-            <label><input type="radio" name="q2"> a) Grafiknya selalu tegak lurus</label>
-            <label><input type="radio" name="q2" value="correct"> b) Grafiknya simetris terhadap garis \( y=x \)</label>
-            <label><input type="radio" name="q2"> c) Selalu berpotongan di dua titik</label>
-            <label><input type="radio" name="q2"> d) Tidak ada hubungan khusus</label>
-        </div>
-        <button onclick="showExplanation('exp2')">Lihat Penjelasan</button>
-        <div id="exp2" class="explanation">
-            Grafik \( f \) dan \( f^{-1} \) selalu simetris terhadap garis \( y=x \).  
-            Jika \( (a,b) \in f \), maka \( (b,a) \in f^{-1} \).
-        </div>
-    </div>
-
-    <!-- Question 3 -->
-    <div class="question-box">
-        <div class="question-title">
-            3. Pernyataan benar tentang fungsi \( \operatorname{arccot} x \) adalah …
-        </div>
-        <div class="options">
-            <label><input type="radio" name="q3"> a) I saja</label>
-            <label><input type="radio" name="q3"> b) I, II</label>
-            <label><input type="radio" name="q3" value="correct"> c) II, IV</label>
-            <label><input type="radio" name="q3"> d) I, III, IV</label>
-        </div>
-        <button onclick="showExplanation('exp3')">Lihat Penjelasan</button>
-        <div id="exp3" class="explanation">
-            I salah (arccot berarti cot y = x).  
-            II benar (domain seluruh real).  
-            III salah (range adalah (0, π)).  
-            IV benar (arccot 0 = π/2).  
-            Jadi jawaban: II dan IV.
-        </div>
-    </div>
-
-    <!-- Question 4 -->
-    <div class="question-box">
-        <div class="question-title">
-            4. Pernyataan benar tentang fungsi hiperbolik berikut adalah …
-        </div>
-        <div class="options">
-            <label><input type="radio" name="q4"> a) I saja</label>
-            <label><input type="radio" name="q4"> b) I, II</label>
-            <label><input type="radio" name="q4" value="correct"> c) III, IV</label>
-            <label><input type="radio" name="q4"> d) II, III, IV</label>
-        </div>
-        <button onclick="showExplanation('exp4')">Lihat Penjelasan</button>
-        <div id="exp4" class="explanation">
-            I salah (tanh ganjil).  
-            II salah (sech genap).  
-            III benar (cosh²x = 1 + sinh²x).  
-            IV benar (cosh genap, simetri sumbu y).  
-            Jadi benar: III dan IV.
-        </div>
-    </div>
-
-</div>
-
-<footer>Created by Adrian · 2025</footer>
-
-<script>
-function showExplanation(id) {
-    document.getElementById(id).style.display = "block";
+  );
 }
-</script>
-
-</body>
-</html>
