@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Instant Quiz</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      max-width: 600px; 
+      margin: 40px auto; 
+      line-height: 1.6;
+    }
+    .question { font-size: 20px; margin-bottom: 10px; }
+    button { 
+      width: 100%;
+      padding: 12px; 
+      margin: 6px 0; 
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .explanation {
+      padding: 10px;
+      background: #eef;
+      border-left: 4px solid #66f;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Quick Quiz</h1>
+<div id="quiz"></div>
+
+<script>
+const questions = [
+  {
+    q: "What is 2 + 2?",
+    options: ["3", "4", "5"],
+    correct: 1,
+    explanation: "2 + 2 = 4 because it is simple addition of two pairs."
+  },
+  {
+    q: "Which planet is known as the Red Planet?",
+    options: ["Mars", "Jupiter", "Venus"],
+    correct: 0,
+    explanation: "Mars appears red due to iron oxide on its surface."
+  }
+];
+
+let index = 0;
+
+function loadQuestion() {
+  const q = questions[index];
+  document.getElementById("quiz").innerHTML = `
+    <div class="question">${q.q}</div>
+    ${q.options.map((opt, i) => 
+      `<button onclick="check(${i})">${opt}</button>`
+    ).join("")}
+    <div id="explain"></div>
+  `;
+}
+
+function check(selected) {
+  const q = questions[index];
+  const expBox = document.getElementById("explain");
+
+  if (selected === q.correct) {
+    expBox.innerHTML = `<div class="explanation"><b>Correct!</b><br>${q.explanation}</div>`;
+  } else {
+    expBox.innerHTML = `<div class="explanation"><b>Incorrect.</b><br>${q.explanation}</div>`;
+  }
+
+  // Move to next question after 2 seconds
+  setTimeout(() => {
+    index++;
+    if (index < questions.length) loadQuestion();
+    else document.getElementById("quiz").innerHTML = "<h2>You finished the quiz!</h2>";
+  }, 2000);
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
