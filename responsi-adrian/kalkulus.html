@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course – Responsi Adrian</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              400: '#fb7185',
+              500: '#ef4444',
+              600: '#dc2626',
+              700: '#b91c1c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #e2e8f0;
+      border-radius: 20px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background-color: #cbd5e1;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 font-sans text-slate-800">
+
+<div 
+  x-data="{
+    open: false,
+    active: 'materi1', 
+    
+    materi: {
+          materi1: { title: '1. Bentuk-bentuk limit tak tentu', file: 'Materi1Kal2.pdf' },
+          materi2: { title: '2. Integral tak wajar', file: 'Materi2.pdf' },
+          materi3: { title: '3. Persamaan parametrik', file: 'Materi3.pdf' },
+          materi4: { title: '4. Panjang kurva dan Luas permukaan benda putar', file: 'Materi4.pdf' },
+          materi5: { title: '5. Sistem koordinat polar', file: 'Materi5.pdf' },
+          materi6: { title: '6. Grafik persamaan polar', file: 'Materi6.pdf' },
+          materi7: { title: '7. Kalkulus dalam koordinat polar', file: 'Materi7.pdf' },
+          materi8: { title: '8. Fungsi dua variabel atau lebih', file: 'Materi8.pdf' },
+          materi9: { title: '9. Turunan parsial', file: 'Materi9.pdf' },
+          materi10: { title: '10. Limit dan kekontinuan', file: 'Materi10.pdf' },
+          materi11: { title: '11. Keterturunan', file: 'Materi11.pdf' },
+          materi12: { title: '12. Turunan berarah dan gradien', file: 'Materi12.pdf' },
+          materi13: { title: '13. Aturan rantai', file: 'Materi13.pdf' },
+          materi14: { title: '14. Bidang singgung dan aproksimasi', file: 'Materi14.pdf' },
+          materi15: { title: '15. Maksimum dan minimum', file: 'Materi15.pdf' },
+          materi16: { title: '16. Metode pengali lagrange', file: 'Materi16.pdf' },
+          materi17: { title: '17. Integral ganda dua atas daerah persegi panjang', file: 'Materi17.pdf' },
+          materi18: { title: '18. Integral berulang', file: 'Materi18.pdf' },
+          materi19: { title: '19. Integral ganda dua atas daerah bukan persegi panjang', file: 'Materi19.pdf' },
+          materi20: { title: '20. Integral ganda dua dalam koordinat polar', file: 'Materi20.pdf' },
+          materi21: { title: '21. Luas permukaan', file: 'Materi21.pdf' },
+          materi22: { title: '22. Integral ganda tiga pada koordinat kartesian', file: 'Materi22.pdf' },
+          materi23: { title: '23. Integral ganda tiga pada koordinat silinder dan bola', file: 'Materi23.pdf' },
+          materi24: { title: '24. Penggantian variabel', file: 'Materi24.pdf' },
+          materi25: { title: '25. Barisan tak hingga', file: 'Materi25.pdf' },
+          materi26: { title: '26. Barisan tak hingga (lanjutan)', file: 'Materi26.pdf' }
+    }
+  }"
+  class="min-h-screen flex">
+
+  <aside 
+    :class="open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    class="fixed md:static z-40 w-72 bg-white border-r border-slate-200 h-screen p-6 transition-transform duration-300 flex flex-col"
+  >
+    <div class="shrink-0 mb-6">
+      <a href="index.html" class="group flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform">
+          <path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path>
+        </svg>
+        Kembali ke Beranda
+      </a>
+    </div>
+
+    <div class="shrink-0 mb-6">
+      <h1 class="text-xl font-extrabold tracking-tight">
+        <span class="text-brand-600">Responsi</span> Adrian
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">Kalkulus</p>
+    </div>
+
+    <div class="flex-1 overflow-y-auto custom-scroll -mr-3 pr-3">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 sticky top-0 bg-white py-1 z-10">
+        📘 Materi
+      </p>
+      
+      <nav class="space-y-1 pb-4">
+        
+        <template x-for="(item, key) in materi" :key="key">
+          <button 
+            @click="active = key; open = false"
+            class="w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition mb-1"
+            :class="active === key ? 'bg-brand-50 text-brand-600 font-semibold' : 'hover:bg-slate-100 text-slate-600'"
+            x-text="item.title">
+          </button>
+        </template>
+
+      </nav>
+    </div>
+
+    <div class="shrink-0 pt-4 mt-2 border-t border-slate-100">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+        📝 Kuis
+      </p>
+      <nav class="space-y-1">
+        <button @click="active='kuis-1'; open=false"
+          class="w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition"
+          :class="active==='kuis-1' ? 'bg-brand-50 text-brand-600 font-semibold' : 'hover:bg-slate-100'">
+          Kuis 1
+        </button>
+      </nav>
+    </div>
+  </aside>
+
+  <div x-show="open" @click="open=false" class="fixed inset-0 bg-black/40 z-30 md:hidden"></div>
+
+  <main class="flex-1 p-6 md:p-10 max-w-6xl mx-auto w-full">
+    <div class="md:hidden mb-6 flex justify-between items-center">
+      <button @click="open=true" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold shadow-sm">
+        ☰ Daftar Isi
+      </button>
+      <span class="font-bold text-brand-600">Course</span>
+    </div>
+
+    <section x-show="!active.includes('kuis') && materi[active]" x-transition.opacity.duration.300ms>
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-6 text-slate-900" x-text="materi[active].title"></h2>
+
+      <div class="relative group">
+        <div class="absolute inset-0 flex items-center justify-center bg-slate-100 rounded-2xl -z-10">
+          <span class="text-slate-400 text-sm animate-pulse flex items-center gap-2">
+            <svg class="animate-spin h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Memuat Dokumen...
+          </span>
+        </div>
+
+        <iframe 
+          :src="materi[active].file + '#toolbar=0&navpanes=0&scrollbar=0&view=FitH'"
+          class="w-full h-[75vh] md:h-[85vh] rounded-2xl border-0 shadow-2xl ring-1 ring-slate-900/5 bg-white"
+          title="PDF Viewer">
+        </iframe>
+        
+        <a 
+          :href="materi[active].file" 
+          target="_blank"
+          class="absolute top-4 right-6 bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 hover:text-brand-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm border border-slate-200 transition-all opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-200 flex items-center gap-2 z-10">
+          <span>Buka Fullscreen</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+      </div>
+    </section>
+
+    <section x-show="active.includes('kuis')" x-cloak>
+      <h2 class="text-3xl font-extrabold mb-4">Kuis 1</h2>
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-50 text-brand-600 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">Area Kuis</h3>
+        <p class="text-slate-500 mt-2 mb-6">Fitur kuis ini belum dikonfigurasi sepenuhnya.</p>
+        <button class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg transition">Mulai Kuis</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>
